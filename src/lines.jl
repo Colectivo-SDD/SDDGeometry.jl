@@ -25,6 +25,7 @@ Line(z0::Number, a0::Real) = Line(z0,a0)
 
 basepoint(l::Line) = l.base
 angle(l::Line) = l.angle
+normal(l::Line) = cos(l.angle), sin(l.angle)
 
 show(io::IO, l::Line)
   print(io, "Line: base point", l.base, ", angle with X ", l.angle)
@@ -55,6 +56,9 @@ LineSegment(z10::Number, z20::Number) = LineSegment(promote(z10,z20)...)
 
 initialpoint(l::LineSegment) = l.z1
 finalpoint(l::LineSegment) = l.z2
+basepoint(l::LineSegment) = l.z1
+angle(l::LineSegment) = angle(z1-z2)
+normal(l::LineSegment) = perp(z1-z2)
 
 show(io::IO, l::LineSegment)
   print(io, "Line Segment: from ", l.z1, " to ", l.z2)
@@ -89,6 +93,7 @@ Ray(z0::Number, a0::Real) = Ray(z0,a0)
 
 basepoint(l::Ray) = l.base
 angle(l::Ray) = l.angle
+normal(l::Ray) = cos(l.angle), sin(l.angle)
 
 show(io::IO, l::Ray)
   print(io, "Ray: base point", l.base, ", angle with X ", l.angle)
@@ -117,6 +122,7 @@ BiRay(z10::Number, z20::Number, a0::Real) = BiRay(promote(z10,z20)...,a0)
 initialpoint(l::BiRay) = l.z1
 finalpoint(l::BiRay) = l.z2
 angle(l::BiRay) = l.angle
+normal(l::BiRay) = cos(l.angle), sin(l.angle)
 
 show(io::IO, l::Ray)
   print(io, "Bi-Ray: initial point", l.z1, ", final point", l.z2, ", angle with X ", l.angle)
@@ -127,8 +133,8 @@ end
 ToDO!
 
 LineR2
-Ray
 RayR2
+ByRayR2
 LineSegmentR2
 =#
 
@@ -140,3 +146,16 @@ end
 function linecomplexes(z1::Number, z2::Number, numpts::Integer=100)
   [z1+t*(z2-z1)/numpts for t ∈ 0:numpts]
 end
+
+
+"""
+Checks if `z` is inside the semi-plane determined by the line `l` with
+  \$0 > normal \\cdot (z - base)\$.
+"""
+isinside(z::Number, l::Line) = 0 > dot(normal(l), z - l.base)
+
+"""
+Checks if `z` is outside the semi-plane determined by the line `l` with
+  \$0 < normal \\cdot (z - base)\$.
+"""
+isoutside(z::Number, c::Line) = 0 < dot(normal(l), z - l.base)

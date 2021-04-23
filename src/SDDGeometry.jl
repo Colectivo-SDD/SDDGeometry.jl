@@ -9,7 +9,7 @@ export
     perp
 
 
-include("curve2d.jl")
+include("abstractcurves.jl")
 include("lines.jl")
 include("circles.jl")
 
@@ -19,20 +19,23 @@ export
     AbstractLinearCurve,
     AbstractCircularCurve,
     Line,
-    #Ray,
+    Ray,
     LineSegment,
+    basepoint,
+    angle,
+    normal,
     initialpoint,
     finalpoint,
     linepoints,
     linecomplexes,
+    isinside,
+    isoutside,
     Circle,
     CircularArc,
     CLine,
     center,
     radius,
     radius2,
-    isinside,
-    isoutside,
     circlepoints,
     circlecomplexes
 
@@ -43,7 +46,7 @@ export
 #include("stereographicprojections.jl")
 
 
-include("mobiustransformation.jl")
+include("mobiustransformations.jl")
 
 export
     AbstractMobiusTransformation,
