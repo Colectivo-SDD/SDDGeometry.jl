@@ -2,6 +2,9 @@
 "Geometry utils for the SDD ecosystem."
 module SDDGeometry
 
+import Base: show
+
+
 include("utils.jl")
 
 export
@@ -17,23 +20,40 @@ export
     AbstractCurve2D,
     AbstractLinearCircularCurve,
     AbstractLinearCurve,
+    AbstractLine,
+    AbstractRay,
+    AbstractLineSegment,
     AbstractCircularCurve,
+    AbstractCircle,
+    AbstractArc,
     Line,
     Ray,
     LineSegment,
     basepoint,
+    basepointC,
+    basepointR2,
     angle,
     normal,
+    normalC,
+    normalR2,
     initialpoint,
     finalpoint,
+    initialpointC,
+    finalpointC,
+    initialpointR2,
+    finalpointR2,
     linepoints,
     linecomplexes,
     isinside,
     isoutside,
     Circle,
-    CircularArc,
-    CLine,
+    Arc,
+    #CLine,
     center,
+    centerC,
+    centerR2,
+    centerx,
+    centery,
     radius,
     radius2,
     circlepoints,
@@ -68,6 +88,6 @@ export
 
 
 #include("inversions.jl")
-
+#export
 
 end # module
