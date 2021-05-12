@@ -1,16 +1,16 @@
 
 """
-    Line(z,angle)
+    Line(z,a)
 
 Line in the complex plane.
 
 #### Arguments
 - `z::Number`: Base point belonging to the line.
-- `angle::Real`: Angle (in radians) between the line and the X axis.
+- `a::Real`: Angle (in radians) between the line and the X axis.
 """
 struct Line{N <: Number, R <: Real} <: AbstractLine
   base::N
-  angle::R
+  a::R
 
   function Line{N,R}(z0::N, a0::R) where {N <: Number, R <: Real}
     new(z0,a0)
@@ -22,27 +22,27 @@ Line(z0::N, a0::R) where {N <: Number, R <: Real} = Line{N,R}(z0,a0)
 basepoint(l::Line) = l.base
 basepointC(l::Line) = l.base
 basepointR2(l::Line) = real(l.base), imag(l.base)
-angle(l::Line) = l.angle
-normal(l::Line) = complex(cos(l.angle), sin(l.angle))
-normalC(l::Line) = complex(cos(l.angle), sin(l.angle))
-normalR2(l::Line) = cos(l.angle), sin(l.angle)
+lineangle(l::Line) = l.a
+normal(l::Line) = complex(cos(l.a), sin(l.a))
+normalC(l::Line) = complex(cos(l.a), sin(l.a))
+normalR2(l::Line) = cos(l.a), sin(l.a)
 
 Base.show(io::IO, l::Line{N,R}) where {N,R} =
-print(io, "Line{$N,$R}: base point ", l.base, ", angle with X ", l.angle)
+print(io, "Line{$N,$R}: base point ", l.base, ", angle with X ", l.a)
 
 
 """
-    Ray(z,angle)
+    Ray(z,a)
 
 A straight line ray.
 
 #### Arguments
 - `z::Number`: Base point belonging to the ray.
-- `angle::Real`: Angle (in radians) between the ray and the X axis.
+- `a::Real`: Angle (in radians) between the ray and the X axis.
 """
 struct Ray{N <: Number, R <: Real} <: AbstractRay
   base::N
-  angle::R
+  a::R
 
   function Ray{N,R}(z0::N, a0::R) where {N <: Number, R <: Real}
     new(z0,a0)
@@ -54,26 +54,26 @@ Ray(z0::N, a0::R) where {N <: Number, R <: Real} = Ray{N,R}(z0,a0)
 basepoint(l::Ray) = l.base
 basepointC(l::Ray) = l.base
 basepointR2(l::Ray) = real(l.base), imag(l.base)
-angle(l::Ray) = l.angle
-normal(l::Ray) = complex(cos(l.angle), sin(l.angle))
-normalC(l::Ray) = complex(cos(l.angle), sin(l.angle))
-normalR2(l::Ray) = cos(l.angle), sin(l.angle)
+lineangle(l::Ray) = l.a
+normal(l::Ray) = complex(cos(l.a), sin(l.a))
+normalC(l::Ray) = complex(cos(l.a), sin(l.a))
+normalR2(l::Ray) = cos(l.a), sin(l.a)
 
 
 Base.show(io::IO, l::Ray{N,R}) where {N,R} =
-print(io, "Ray{$N,$R}: base point", l.base, ", angle with X ", l.angle)
+print(io, "Ray{$N,$R}: base point", l.base, ", angle with X ", l.a)
 
 
 """
-    BiRay(z1,z2,angle)
+    BiRay(z1,z2,a)
 
 A straight line bi-ray: the ray from \$z_1\$ to \$\\infty\$ union
-the ray from \$z_2\$ to \$\\infty\$.
+the ray from \$z_2\$ to \$\\infty\$, with complementary angles.
 """
 struct BiRay{N <: Number, R <: Real} <: AbstractLinearCurve
   z1::N
   z2::N
-  angle::R
+  a::R
 
   function BiRay{N,R}(z10::N, z20::N, a0::R) where {N <: Number, R <: Real}
     new(z10,z20,a0)
@@ -85,13 +85,13 @@ BiRay(z10::Number, z20::Number, a0::Real) = BiRay(promote(z10,z20)...,a0)
 
 initialpoint(l::BiRay) = l.z1
 finalpoint(l::BiRay) = l.z2
-angle(l::BiRay) = l.angle
-normal(l::BiRay) = cos(l.angle), sin(l.angle)
+lineangle(l::BiRay) = l.a
+normal(l::BiRay) = cos(l.a), sin(l.a)
 
-torays(br::BiRay) = Ray(initialpoint(br),angle(br)), Ray(finalpoint(br),angle(br)+π)
+torays(br::BiRay) = Ray(initialpoint(br),lineangle(br)), Ray(finalpoint(br),lineangle(br)+π)
 
 Base.show(io::IO, l::BiRay{N,R}) where {N,R} =
-  print(io, "BiRay{$N,$R}: initial point", l.z1, ", final point", l.z2, ", angle with X ", l.angle)
+  print(io, "BiRay{$N,$R}: initial point", l.z1, ", final point", l.z2, ", angle with X ", l.a)
 
 
 """
@@ -117,7 +117,7 @@ initialpointC(l::LineSegment) = l.z1
 finalpointC(l::LineSegment) = l.z2
 initialpointR2(l::LineSegment) = real(l.z1), imag(l.z1)
 finalpointR2(l::LineSegment) = real(l.z2), imag(l.z2)
-angle(l::LineSegment) = angle(z1-z2)
+lineangle(l::LineSegment) = angle(z1-z2)
 normal(l::LineSegment) = perp(z1-z2)
 normalC(l::LineSegment) = perp(z1-z2)
 #normalR2(l::LineSegment) = perp(z1-z2)

@@ -1,7 +1,7 @@
 
 import Base: ∘
 
-abstract type AbstractMobiusTransformation{T <: Number} end
+abstract type AbstractMobiusTransformation{T <: Number} <: Function end
 
 """
     MobiusTransformation(a,b,c,d)
@@ -23,9 +23,11 @@ struct MobiusTransformation{T} <: AbstractMobiusTransformation{T}
 
 end
 
-MobiusTransformation(a0::T, b0::T, c0::T, d0::T) where {T <: Number} = MobiusTransformation{T}(a0,b0,c0,d0)
+MobiusTransformation(a0::T, b0::T, c0::T, d0::T) where {T <: Number} =
+MobiusTransformation{T}(a0,b0,c0,d0)
 
-MobiusTransformation(a0::Number, b0::Number, c0::Number, d0::Number) = MobiusTransformation(promote(a0,b0,c0,d0)...)
+MobiusTransformation(a0::Number, b0::Number, c0::Number, d0::Number) =
+MobiusTransformation(promote(a0,b0,c0,d0)...)
 
 
 """
@@ -45,7 +47,7 @@ end
 
 LinearTransformation(a0::T) where {T <: Number} = LinearTransformation{T}(a0)
 
-#MobiusTransformation(a0::T) where {T <: Number} = LinearTransformation{T}(a0)
+MobiusTransformation(a0::Number) = LinearTransformation(a0)
 
 
 """
@@ -78,16 +80,13 @@ struct AffineTransformation{T} <: AbstractMobiusTransformation{T}
   function AffineTransformation{T}(a0::T, b0::T) where T <:Number
     new(a0,b0)
   end
-
 end
 
 AffineTransformation(a0::T, b0::T) where {T <: Number} = AffineTransformation{T}(a0,b0)
 
 AffineTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
 
-#MobiusTransformation(a0::T, b0::T) where {T <: Number} = AffineTransformation{T}(a0,b0)
-
-#MobiusTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
+MobiusTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
 
 
 """
@@ -102,26 +101,25 @@ struct InversionReflection{T} <: AbstractMobiusTransformation{T}
   function InversionReflection{T}(b0::T) where T <:Number
     new(b0)
   end
-
 end
 
 InversionReflection(b0::T) where {T <: Number} = InversionReflection{T}(b0)
 
 
 Base.show(io::IO, f::MobiusTransformation{T}) where T =
-  print(io, "Möbius Transformation {$T}: z -> ((", f.a, ")z + (", f.b, ")) / ((", f.c, ")z + (", f.d, "))")
+  print(io, "MöbiusTransformation{$T}: z -> ((", f.a, ")z + (", f.b, ")) / ((", f.c, ")z + (", f.d, "))")
 
 Base.show(io::IO, f::LinearTransformation{T}) where T  =
-  print(io, "Linear Transformation {$T}: z -> (", f.a, ")z")
+  print(io, "LinearTransformation{$T}: z -> (", f.a, ")z")
 
 Base.show(io::IO, f::Translation{T}) where T  =
-  print(io, "Translation {$T}: z -> z + (", f.b, ")")
+  print(io, "Translation{$T}: z -> z + (", f.b, ")")
 
 Base.show(io::IO, f::AffineTransformation{T}) where T  =
-  print(io, "Affine Transformation {$T}: z -> (", f.a, ")z + (", f.b, ")")
+  print(io, "AffineTransformation{$T}: z -> (", f.a, ")z + (", f.b, ")")
 
 Base.show(io::IO, f::InversionReflection{T}) where T  =
-  print(io, "Inversion Reflection {$T}: z -> (", f.b, ") / z")
+  print(io, "InversionReflection{$T}: z -> (", f.b, ") / z")
 
 
 function (f::MobiusTransformation)(z::Number)
@@ -343,6 +341,7 @@ function kind(f::AbstractMobiusTransformation)
   t = tr(f) / det(f)
   t2 = t^2
   if imag(t2) ≈ 0
+    t2 = real(t2)
     if t2 == 4
       return :parabolic
     end
@@ -437,7 +436,6 @@ compose(f::MobiusTransformation, g::AffineTransformation) =
 Binary operator to compose two Möbius transformations.
 """
 ∘(f::AbstractMobiusTransformation, g::AbstractMobiusTransformation) = compose(f,g)
-
 
 
 """
