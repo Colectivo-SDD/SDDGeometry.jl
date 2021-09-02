@@ -18,17 +18,19 @@ struct Line{N <: Number, R <: Real} <: AbstractLine
 end
 
 Line(z0::N, a0::R) where {N <: Number, R <: Real} = Line{N,R}(z0,a0)
+#Line(a::R, b::R, c::R) where {R <: Real} = Line{Complex,R}(???)
+Line(l::Line{N,R}) where {N <: Number, R <: Real} = Line{N,R}(l.base,l.a)
 
 basepoint(l::Line) = l.base
 basepointC(l::Line) = l.base
 basepointR2(l::Line) = real(l.base), imag(l.base)
 lineangle(l::Line) = l.a
-normal(l::Line) = complex(cos(l.a), sin(l.a))
-normalC(l::Line) = complex(cos(l.a), sin(l.a))
+normal(l::Line) = complexU(l.a)
+normalC(l::Line) = complexU(l.a)
 normalR2(l::Line) = cos(l.a), sin(l.a)
 
-Base.show(io::IO, l::Line{N,R}) where {N,R} =
-print(io, "Line{$N,$R}: base point ", l.base, ", angle with X ", l.a)
+Base.show(io::IO, l::Line{N,R}) where {N<:Number,R<:Real} =
+  print(io, "Line{$N,$R}: base point ", l.base, ", angle with X ", l.a)
 
 
 """
@@ -166,3 +168,16 @@ Checks if `z` is outside the semi-plane determined by the line `l` with
   \$0 < normal \\cdot (z - base)\$.
 """
 isoutside(z::Number, c::Line) = 0 < dot(normal(l), z - l.base)
+
+
+"""
+"""
+distance(z::Number, l::Line) = abs(dot(perp(complexU(l.a)), z - l.base))
+
+"""
+"""
+signeddistance(z::Number, l::Line) = dot(perp(complexU(l.a)), z - l.base)
+
+"""
+"""
+nearestpoint(z::Number, l::Line) = z - distance(z,l)*perp(complexU(l.a))

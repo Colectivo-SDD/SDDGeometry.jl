@@ -9,7 +9,8 @@ include("utils.jl")
 
 export
     dot,
-    perp
+    perp,
+    complexU
 
 
 include("abstractcurves.jl")
@@ -18,7 +19,7 @@ include("circles.jl")
 
 export
     AbstractCurve2D,
-    AbstractLinearCircularCurve,
+    AbstractCircularLinearCurve,
     AbstractLinearCurve,
     AbstractLine,
     AbstractRay,
@@ -56,8 +57,22 @@ export
     centery,
     radius,
     radius2,
+    pickpoint,
     circlepoints,
-    circlecomplexes
+    circlecomplexes,
+    distance,
+    signeddistance,
+    nearestpoint
+
+
+#include("discs.jl")
+
+#export
+#    AbstractDisc,
+#    Disc,
+#    HemiPlane
+#    isinside,
+#    isoutside,
 
 
 #include("intersections.jl")
@@ -67,15 +82,21 @@ export
 
 
 include("mobiustransformations.jl")
+include("inversions.jl")
 
 export
+    AbstractComplexInvertibleFunction,
     AbstractMobiusTransformation,
     MobiusTransformation,
+    AbstractAffineTransformation,
     LinearTransformation,
     Translation,
     AffineTransformation,
     InversionReflection,
-    #a, b, c, d,
+    AbstractInversion,
+    CircleInversion,
+    Reflection,
+    #a, b, c, d, r, p, θ,
     inverse,
     derivative,
     fixedpoints,
@@ -86,9 +107,5 @@ export
     ∘,
     maptozerooneinf,
     mapfromzerooneinf
-
-
-#include("inversions.jl")
-#export
 
 end # module

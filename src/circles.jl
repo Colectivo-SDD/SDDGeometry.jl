@@ -1,5 +1,4 @@
 
-
 """
     Circle(c,r)
 
@@ -22,6 +21,7 @@ struct Circle{N <: Number, R <: Real} <: AbstractCircle
 end
 
 Circle(c0::N, r0::R) where {N <: Number, R <: Real} = Circle{N,R}(c0,r0)
+Circle(c::Circle{N,R}) where {N <: Number, R <: Real} = Circle{N,R}(c.center,c.radius)
 
 center(c::Circle) = c.center
 centerC(c::Circle) = c.center
@@ -30,6 +30,8 @@ centerx(c::Circle) = real(c.center)
 centery(c::Circle) = imag(c.center)
 radius(c::Circle) = c.radius
 radius2(c::Circle) = c.radius*c.radius
+
+pickpoint(c::Circle,θ::Real) = c.center + c.radius*complexU(θ)
 
 Base.show(io::IO, c::Circle{N,R}) where {N,R} =
 print(io, "Circle{$N,$R}: |z - (", c.center, ")| = ", c.radius)
@@ -55,6 +57,7 @@ end
 
 CircleR2(x0::R, y0::R, r0::R) where {R <: Real} = CircleR2{R}(x0,y0,r0)
 CircleR2(x0::Real, y0::Real, r0::Real) = CircleR2(promote(x0,y0,r0)...)
+CircleR2(c::CircleR2{R}) where {R <: Real} = CircleR2{R}(c.centerx,c.centery,c.radius)
 
 center(c::CircleR2) = c.centerx, c.centery
 centerC(c::CircleR2) = complex(c.centerx, c.centery)
@@ -63,6 +66,8 @@ centerx(c::CircleR2) = c.centerx
 centery(c::CircleR2) = c.centery
 radius(c::CircleR2) = c.radius
 radius2(c::CircleR2) = c.radius*c.radius
+
+pickpoint(c::CircleR2,θ::Real) = c.centerx + c.radius*cos(θ), c.centery + c.radius*sin(θ)
 
 Base.show(io::IO, c::CircleR2{R}) where {R} =
 print(io, "CircleR2{$R}: |(x,y) - (", c.centerx, ",", c.centery, " )| = ", c.radius)

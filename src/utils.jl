@@ -44,3 +44,9 @@ ToDo!
 circumcenter
 circumradius
 =#
+
+
+"""
+Create an unitarian complex number with argument \$\\theta\$.
+"""
+complexU(θ::Real) = complex(cos(θ),sin(θ))

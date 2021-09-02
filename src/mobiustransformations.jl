@@ -1,7 +1,21 @@
 
 import Base: ∘
 
-abstract type AbstractMobiusTransformation{T <: Number} <: Function end
+"""
+Abstract type, base for invertible function in the Riemann sphere.
+"""
+abstract type AbstractComplexInvertibleFunction#={T <: Number}=# <: Function end
+
+"""
+Abstract type, base for Möbius transformations.
+"""
+abstract type AbstractMobiusTransformation#={T}=# <: AbstractComplexInvertibleFunction#={T}=# end
+
+"""
+Abstract type, base for affine transformations.
+"""
+abstract type AbstractAffineTransformation <: AbstractMobiusTransformation end
+
 
 """
     MobiusTransformation(a,b,c,d)
@@ -10,13 +24,13 @@ Möbius transformation, a conformal automorphism in the Riemann sphere
 \$z \\mapsto \\frac{az+b}{cz+d}\$
 with \$ad-bc\\neq 0\$.
 """
-struct MobiusTransformation{T} <: AbstractMobiusTransformation{T}
+struct MobiusTransformation{T<:Number} <: AbstractMobiusTransformation
   a::T
   b::T
   c::T
   d::T
 
-  function MobiusTransformation{T}(a0::T, b0::T, c0::T, d0::T) where T <: Number
+  function MobiusTransformation{T}(a0::T, b0::T, c0::T, d0::T) where T<:Number
     #@assert a0 * d0 - b0 * c0 != 0 "Invalid parameters for Möbius transformation."
     new(a0,b0,c0,d0)
   end
@@ -29,6 +43,35 @@ MobiusTransformation{T}(a0,b0,c0,d0)
 MobiusTransformation(a0::Number, b0::Number, c0::Number, d0::Number) =
 MobiusTransformation(promote(a0,b0,c0,d0)...)
 
+MobiusTransformation(f::MobiusTransformation{T}) where {T <: Number} =
+MobiusTransformation{T}(f.a,f.b,f.c,f.d)
+
+
+"""
+    AffineTransformation(a,b)
+
+Affine transformation in the Riemann sphere
+\$z \\mapsto a z + b\$.
+"""
+struct AffineTransformation{T<:Number} <: AbstractAffineTransformation
+  a::T
+  b::T
+
+  function AffineTransformation{T}(a0::T, b0::T) where T <:Number
+    new(a0,b0)
+  end
+end
+
+AffineTransformation(a0::T, b0::T) where {T <: Number} =
+  AffineTransformation{T}(a0,b0)
+AffineTransformation(a0::Number, b0::Number) =
+  AffineTransformation(promote(a0,b0)...)
+AffineTransformation(f::AffineTransformation{T}) where {T <: Number} =
+  AffineTransformation(f.a,f.b)
+
+MobiusTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
+MobiusTransformation(f::AffineTransformation) = AffineTransformation(f)
+
 
 """
     LinearTransformation(a)
@@ -36,7 +79,7 @@ MobiusTransformation(promote(a0,b0,c0,d0)...)
 Linear transformation (homotecy and rotation) in the Riemann sphere
 \$z \\mapsto a z\$.
 """
-struct LinearTransformation{T} <: AbstractMobiusTransformation{T}
+struct LinearTransformation{T<:Number} <: AbstractAffineTransformation
   a::T
 
   function LinearTransformation{T}(a0::T) where T <: Number
@@ -46,9 +89,12 @@ struct LinearTransformation{T} <: AbstractMobiusTransformation{T}
 end
 
 LinearTransformation(a0::T) where {T <: Number} = LinearTransformation{T}(a0)
+LinearTransformation(f::LinearTransformation{T}) where {T <: Number} =
+  LinearTransformation{T}(f.a)
 
 MobiusTransformation(a0::Number) = LinearTransformation(a0)
-
+MobiusTransformation(f::LinearTransformation) = LinearTransformation(f)
+AffineTransformation(f::LinearTransformation) = LinearTransformation(f)
 
 """
     Translation(b)
@@ -56,7 +102,7 @@ MobiusTransformation(a0::Number) = LinearTransformation(a0)
 Translation in the Riemann sphere
 \$z \\mapsto z + b\$.
 """
-struct Translation{T} <: AbstractMobiusTransformation{T}
+struct Translation{T<:Number} <: AbstractAffineTransformation
   b::T
 
   function Translation{T}(b0::T) where T <:Number
@@ -65,28 +111,10 @@ struct Translation{T} <: AbstractMobiusTransformation{T}
 end
 
 Translation(b0::T) where {T <: Number} = Translation{T}(b0)
+Translation(f::Translation{T}) where {T <: Number} = Translation{T}(f.b)
 
-
-"""
-    AffineTransformation(a,b)
-
-Affine transformation in the Riemann sphere
-\$z \\mapsto a z + b\$.
-"""
-struct AffineTransformation{T} <: AbstractMobiusTransformation{T}
-  a::T
-  b::T
-
-  function AffineTransformation{T}(a0::T, b0::T) where T <:Number
-    new(a0,b0)
-  end
-end
-
-AffineTransformation(a0::T, b0::T) where {T <: Number} = AffineTransformation{T}(a0,b0)
-
-AffineTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
-
-MobiusTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b0)...)
+MobiusTransformation(f::Translation) = Translation(f)
+AffineTransformation(f::Translation) = Translation(f)
 
 
 """
@@ -95,7 +123,7 @@ MobiusTransformation(a0::Number, b0::Number) = AffineTransformation(promote(a0,b
 Inversion reflection in the Riemann sphere
 \$z \\mapsto \\frac{b}{z}\$.
 """
-struct InversionReflection{T} <: AbstractMobiusTransformation{T}
+struct InversionReflection{T<:Number} <: AbstractMobiusTransformation
   b::T
 
   function InversionReflection{T}(b0::T) where T <:Number
@@ -104,31 +132,41 @@ struct InversionReflection{T} <: AbstractMobiusTransformation{T}
 end
 
 InversionReflection(b0::T) where {T <: Number} = InversionReflection{T}(b0)
+InversionReflection(f::InversionReflection{T}) where {T <: Number} =
+  InversionReflection{T}(f.b)
+
+MobiusTransformation(f::InversionReflection) = InversionReflection(f)
 
 
-Base.show(io::IO, f::MobiusTransformation{T}) where T =
+Base.show(io::IO, f::MobiusTransformation{T}) where T<:Number =
   print(io, "MöbiusTransformation{$T}: z -> ((", f.a, ")z + (", f.b, ")) / ((", f.c, ")z + (", f.d, "))")
 
-Base.show(io::IO, f::LinearTransformation{T}) where T  =
+Base.show(io::IO, f::LinearTransformation{T}) where T<:Number  =
   print(io, "LinearTransformation{$T}: z -> (", f.a, ")z")
 
-Base.show(io::IO, f::Translation{T}) where T  =
+Base.show(io::IO, f::Translation{T}) where T<:Number  =
   print(io, "Translation{$T}: z -> z + (", f.b, ")")
 
-Base.show(io::IO, f::AffineTransformation{T}) where T  =
+Base.show(io::IO, f::AffineTransformation{T}) where T<:Number  =
   print(io, "AffineTransformation{$T}: z -> (", f.a, ")z + (", f.b, ")")
 
-Base.show(io::IO, f::InversionReflection{T}) where T  =
+Base.show(io::IO, f::InversionReflection{T}) where T<:Number  =
   print(io, "InversionReflection{$T}: z -> (", f.b, ") / z")
 
 
 function (f::MobiusTransformation)(z::Number)
   # ToDo! Create a method to eval infinity case
   if isinf(z)
-    return f.a / f.c
+    return iszero(f.c) ? Inf : f.a / f.c # Necesary to avoid number/(0+0im) = NaN+NaN*im
   end
 
-  (f.a * z + f.b) / (f.c * z + f.d)
+  den = f.c * z + f.d
+
+  if den ≈ 0 # Necesary to avoid number/(0+0im) = NaN+NaN*im
+    return Inf
+  end
+
+  (f.a * z + f.b) / den
 end
 
 function (f::LinearTransformation)(z::Number)
@@ -147,6 +185,8 @@ function (f::InversionReflection)(z::Number)
   # ToDo! Create a method to eval infinity case
   if isinf(z)
     return 0
+  elseif z ≈ 0 # Necesary to avoid complex/(0+0im) = NaN+NaN*im
+    return Inf
   end
 
   f.b / z
@@ -249,11 +289,12 @@ Derivative.
 
 \$T'(z)=\\frac{ad-bc}{(c z + d)^2}\$
 """
-function derivative(f::MobiusTransformation)
+#=function derivative(f::MobiusTransformation)
   function der(z::Number)
     (f.a * f.d - f.b * f.c) / ((f.c * z + f.d)^2)
   end
-end
+end=#
+derivative(f::MobiusTransformation) = z::Number -> (f.a * f.d - f.b * f.c) / ((f.c * z + f.d)^2)
 
 function derivative(f::LinearTransformation)
   function der(z::Number)
@@ -287,7 +328,7 @@ Returns the fixed points of a Möbius transformation. Always returns two points,
 even in the parabolic case returns the one fixed point duplicated.
 """
 function fixedpoints(f::MobiusTransformation{T}) where T <: Real
-  if f.c == 0
+  if f.c ≈ 0
     return f.b / (f.d - f.a), Inf
   end
   discr = (f.a + f.d)^2 - 4 * (f.a * f.d - f.b * f.c)
@@ -296,7 +337,7 @@ function fixedpoints(f::MobiusTransformation{T}) where T <: Real
 end
 
 function fixedpoints(f::MobiusTransformation)
-  if f.c == 0
+  if f.c ≈ 0
     return f.b / (f.d - f.a), Inf
   end
   rd = sqrt((f.a + f.d)^2 - 4 * (f.a * f.d - f.b * f.c))
@@ -312,7 +353,7 @@ function fixedpoints(f::Translation)
 end
 
 function fixedpoints(f::AffineTransformation)
-  if f.a == 1
+  if f.a ≈ 1
     return Inf, Inf
   end
   f.b / (1 - f.a), Inf
@@ -338,11 +379,10 @@ Kind of Möbius transformation:
 where \$t=tr(T)/det(T)\$.
 """
 function kind(f::AbstractMobiusTransformation)
-  t = tr(f) / det(f)
-  t2 = t^2
+  t2 = (tr(f)^2) / det(f)
   if imag(t2) ≈ 0
     t2 = real(t2)
-    if t2 == 4
+    if t2 ≈ 4
       return :parabolic
     end
 
@@ -350,6 +390,20 @@ function kind(f::AbstractMobiusTransformation)
       return :elliptic
     end
 
+    return :hyperbolic
+  end
+
+  :loxodromic
+end
+
+function kind(f::AbstractAffineTransformation)
+  if a(f) ≈ 1
+    return :parabolic
+  end
+
+  if abs2(a(f)) ≈ 1
+    return :elliptic
+  elseif imag(a(f)) ≈ 0
     return :hyperbolic
   end
 
@@ -380,7 +434,7 @@ compose(f::AffineTransformation, g::AffineTransformation) =
   AffineTransformation(f.a * g.a, f.a * g.b + f.b)
 
 compose(f::InversionReflection, g::InversionReflection) =
-  InversionReflection(f.b / g.b)
+  LinearTransformation(f.b / g.b)
 
 
 # LinearTransformation vs ...
@@ -429,7 +483,7 @@ compose(f::MobiusTransformation, g::AffineTransformation) =
 
 
 # InversionReflection vs ...
-# result in a MobiusTransformation, fall back to AbstractMobiusTransformation implementation
+# all result are a MobiusTransformation, fall back to AbstractMobiusTransformation implementation
 
 
 """
@@ -444,8 +498,19 @@ Binary operator to compose two Möbius transformations.
 Create the Möbius transformation such that \$z_1 \\mapsto 0\$,
 \$z_2 \\mapsto 1\$ and \$z_3 \\mapsto \\infty\$.
 """
-maptozerooneinf(z1::Number, z2::Number, z3::Number) =
+function maptozerooneinf(z1::Number, z2::Number, z3::Number)
+  # z -> ( (z2-z3)(z-z1) ) / ( (z2-z1)(z-z3) )
+
+  if isinf(z1)
+    return MobiusTransformation(0, z2-z3, 1, -z3)
+  elseif isinf(z2)
+    return MobiusTransformation(1, -z1, 1, -z3)
+  elseif isinf(z3)
+    return MobiusTransformation(1, -z1, 0, z2-z1)
+  end
+
   MobiusTransformation(z2-z3, z1*(z3-z2), z2-z1, z3*(z1-z2))
+end
 
 """
     mapfromzerooneinf(z1,z2,z3)
@@ -453,8 +518,21 @@ maptozerooneinf(z1::Number, z2::Number, z3::Number) =
 Create the Möbius transformation such that \$0 \\mapsto z_1\$,
   \$1 \\mapsto z_2\$ and \$\\infty \\mapsto z_3\$.
 """
-mapfromzerooneinf(z1::Number, z2::Number, z3::Number) =
+function mapfromzerooneinf(z1::Number, z2::Number, z3::Number)
+  # z -> ( z3(z1-z2)z + z1(z2-z3) ) / ( (z1-z2)z + (z2-z3) )
+
+  if isinf(z1)
+    return MobiusTransformation(z3, z2-z3, 1, 0)
+  elseif isinf(z2)
+    return MobiusTransformation(-z3, z1, -1, 1)
+  elseif isinf(z3)
+    return MobiusTransformation(z2-z1, z1, 0, 1)
+  end
+
+  # inverse of
+  # MobiusTransformation(z2-z3, z1*(z3-z2), z2-z1, z3*(z1-z2))
   MobiusTransformation(z3*(z1-z2), z1*(z2-z3), z1-z2, z2-z3)
+end
 
 """
 Create the Möbius transformation such that \$z_1 \\mapsto w_1\$,
@@ -485,7 +563,7 @@ end
 Given a Möbius transformation \$f(z)=\\frac{az+b}{cz+d}\$ and a circle
 \$C: |center-z|=radius\$, the circle  \$f(C)\$ has center
 
-\$ w = f(center - \\frac{radius^2}{\\overline{\\frac{d}{c}+center}})
+\$ w = f(center - \\frac{radius^2}{\\overline{\\frac{d}{c}+center}})\$
 
 and radius
 
@@ -503,7 +581,8 @@ function (f::MobiusTransformation)(c::Circle)
 
   # "Grandma's recipe" from "Indra's Pearls" to calculate image of a circle
   z = c.center - c.radius*c.radius/conj(f.d/f.c + c.center)
-  Circle(f(z), abs(z - f(c.center + c.radius)))
+  fz = f(z)
+  Circle(fz, abs(fz - f(c.center + c.radius)))
 end
 
 function (f::LinearTransformation)(c::Circle)
@@ -527,12 +606,13 @@ function (f::InversionReflection)(c::Circle)
 
   # "Grandma's recipe" from "Indra's Pearls" to calculate image of a circle
   z = c.center - c.radius*c.radius/conj(c.center)
-  Circle(f(z), abs(z - f(c.center + c.radius)))
+  fz = f(z)
+  Circle(fz, abs(fz - f(c.center + c.radius)))
 end
 
 
 function (f::MobiusTransformation)(c::Arc)
-  if f.c ≈ 0.0
+  if f.c ≈ 0
     return Arc( f(c.center), f(c.p1), f(c.p2) )
   elseif abs(c.center + f.d/f.c) ≈ radius(c)
     #ToDo!: Case 2 rays!
@@ -569,54 +649,65 @@ end
 
 
 function (f::MobiusTransformation)(l::Line)
-  if f.c ≈ 0.0
+  if f.c ≈ 0.0 # f is Affine
     w1 = f(l.base)
-    return Line( w1, angle(w1-f(l.base+exp(l.angle*im))) )
-  elseif l.base ≈ -f.d/f.c
+    return Line( w1, angle(w1 - f(l.base + complexU(l.a))) )
+  elseif l.base ≈ -f.d/f.c # f(l) through infinity, then is a line
     w = f(Inf)
-    return Line(w, angle(w-f(Inf)))
+    return Line(w, angle(w - f(Inf)))
   else
     a = angle(l.base + f.d/f.c)
-    if a ≈ l.angle || a ≈ (l.angle + pi)
+    if a ≈ l.a || a ≈ (l.a + pi) # f(l) through infinity, then is a line
       w = f(l.base)
-      return Line(w, angle(w-f(Inf)))
+      return Line(w, angle(w - f(Inf)))
     end
   end
 
-  v = exp(im*l.angle)
-  w1 = f(l.base)
-  w2 = f(l.base + v)
-  w3 = f(l.base - v)
-  Circle(circumcenter(w1,w2,w3), circumradius(w1,w2,w3))
+  # General case, f(l) is a circle
+
+  # Decomposing f in simplier transformations
+
+  # Apply z -> z + d/c
+  q = 1.0/(nearestpoint(0, Line(l.base + f.d/f.c, l.a)))
+  center = q/2 #conj(q/2) # Applied z -> 1/z
+  radius = abs(center) # Applied z -> 1/z
+
+  A = (f.b*f.c - f.a*f.d)/(f.c^2)
+  #B = f.a/f.c
+  Circle( A*center + f.a/f.c, abs(A)*radius ) # Apply z -> Az+B
 end
 
 function (f::LinearTransformation)(l::Line)
-  Line(f(l.base), l.angle + angle(f.a))
+  Line(f(l.base), l.a + angle(f.a))
 end
 
 function (f::Translation)(l::Line)
-  Line(f(l.base), l.angle)
+  Line(f(l.base), l.a)
 end
 
 function (f::AffineTransformation)(l::Line)
-  Line(f(l.base), l.angle + angle(f.a))
+  Line(f(l.base), l.a + angle(f.a))
 end
 
 function (f::InversionReflection)(l::Line)
   if l.base ≈ 0
-    return Line(l.base, l.angle + angle(f.b))
+    return Line(l.base, l.a + angle(f.b))
   else
     a = angle(l.base)
-    if a ≈ l.angle || a ≈ (l.angle + pi)
-      return Line(l.base, l.angle + angle(f.b))
+    if a ≈ l.a || a ≈ (l.a + pi)
+      return Line(l.base, l.a + angle(f.b))
     end
   end
 
-  v = exp(im*l.angle)
-  w1 = f(l.base)
-  w2 = f(l.base + v)
-  w3 = f(l.base - v)
-  Circle(circumcenter(w1,w2,w3), circumradius(w1,w2,w3))
+  # General case, f(l) is a circle
+
+  # Decomposing f in simplier transformations
+
+  q = 1.0/(nearestpoint(0, l))
+  center = q/2 #conj(q/2) # Applied z -> 1/z
+  radius = abs(center) # Applied z -> 1/z
+
+  Circle( f.b*center, abs(f.b)*radius ) # Apply z -> bz
 end
 
 
@@ -638,15 +729,7 @@ function (f::MobiusTransformation)(l::LineSegment)
   Arc(circumcenter(w1,w2,w3), w1, w2)
 end
 
-function (f::LinearTransformation)(l::LineSegment)
-  LineSegment(f(l.p1), f(l.p2))
-end
-
-function (f::Translation)(l::LineSegment)
-  LineSegment(f(l.p1), f(l.p2))
-end
-
-function (f::AffineTransformation)(l::LineSegment)
+function (f::AbstractAffineTransformation)(l::LineSegment)
   LineSegment(f(l.p1), f(l.p2))
 end
 
@@ -664,4 +747,9 @@ function (f::InversionReflection)(l::LineSegment)
   w2 = f(l.z2)
   w3 = f((l.z1+l.z2)/2)
   Arc(circumcenter(w1,w2,w3), w1, w2)
+end
+
+
+function (f::AbstractComplexInvertibleFunction)(a::Array)
+  f.(a)
 end
