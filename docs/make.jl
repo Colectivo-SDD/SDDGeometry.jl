@@ -5,7 +5,7 @@ using Documenter
 
 makedocs(
     modules = [SDDGeometry], # Lista de módulos a documentar
-    sitename = "SDDGeometry.jl", # Nombre del documento
+    sitename = "SDDGeometry Reference", # Nombre del documento
     authors = "Colectivo SDD, Facultad de Ciencias, UNAM", # Autores
     #root    = "<current-directory>", # Carpeta raiz donde se ejecuta este script
     #source  = "src", # Carpeta con archivos fuente
@@ -16,5 +16,10 @@ makedocs(
     doctest = false, # Realizar pruebas de código dentro de documentación
     #expandfirst = [],
     #format = DocumenterHTML(...) # Formato de salida
-    format = Documenter.HTML(prettyurls = false)
+    sitename = "SDDGeometry Reference",
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        warn_outdated = true,
+        collapselevel=1,
+        )
 )
