@@ -22,17 +22,26 @@ Return the pependicular vector to \$(x,y)\$.
 perp(x::Real, y::Real) = -y, x
 
 """
+    perp(p) -> SVector
+
+Return the pependicular vector to \$(x,y)\$.
+"""
+perp(p::AbstractVector{<:Real}) = [-y, x]
+
+"""
     perp(z) -> Complex
 
 Return the pependicular complex number to \$z\$.
 """
-perp(z::Number) = -imag(z) + im*real(z)
+perp(z::Number) = complex(-imag(z), real(z))
 
 
 """
+
+\$ ||(x_1,y_1,z_1)\\times (x_2,y_2,z_2)|| \$
 """
 tripledet(x1::Real, y1::Real, x2::Real, y2::Real, x3::Real, y3::Real) =
-  x1*(y2-y3)-y1*(x2-x3)+x2*y3-y2*y3
+  x1*(y2-y3)-y1*(x2-x3)+x2*y3-y2*y3 # ???
 
 """
 """
@@ -47,6 +56,15 @@ circumradius
 
 
 """
+    complexU(θ::Real) -> Complex
+
 Create an unitarian complex number with argument \$\\theta\$.
 """
 complexU(θ::Real) = complex(cos(θ),sin(θ))
+
+"""
+    complexpolar(r::Real, θ::Real) -> Complex
+
+Create complex number with modulus \$r\$ and argument \$\\theta\$.
+"""
+complexpolar(r::Real, θ::Real) = complex(r*cos(θ),r*sin(θ))

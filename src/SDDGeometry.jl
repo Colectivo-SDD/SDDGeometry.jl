@@ -5,12 +5,35 @@ module SDDGeometry
 import Base: show
 
 
+include("coordinates.jl")
+
+
 include("utils.jl")
 
 export
     dot,
     perp,
-    complexU
+    complexU,
+    complexpolar
+
+
+include("distances.jl")
+
+export
+    euclideandistance2D,
+    euclideandistance3D,
+    euclideandistance,
+    manhattandistance2D,
+    manhattandistance3D,
+    manhattandistance,
+    maxdistance2D,
+    maxdistance3D,
+    maxdistance
+    #chordaldistance
+    #sphericdistance
+    #hyperbolicdistanceD
+    #hyperbolicdistanceH2
+    #hyperbolicdistanceH3
 
 
 include("abstractcurves.jl")
@@ -76,36 +99,80 @@ export
 
 
 #include("intersections.jl")
-#include("lengths.jl")
-#include("metrics.jl")
+
+
 #include("stereographicprojections.jl")
 
 
 include("mobiustransformations.jl")
 include("inversions.jl")
 
-export
+export # ToDo: Refactoring Names!!!!
     AbstractComplexInvertibleFunction,
     AbstractMobiusTransformation,
     MobiusTransformation,
-    AbstractAffineTransformation,
-    LinearTransformation,
-    Translation,
-    AffineTransformation,
+    #MobT
+    AbstractAffineTransformation, #AbstractMobiusAffineTransformation
+    LinearTransformation, #MobiusLinearTransformation
+    #MobLinT,
+    Translation, #MobiusTranslation
+    #MobTranslation,
+    AffineTransformation, #MobiusAffineTranslation
+    #MobAffT,
     InversionReflection,
+    #InvRef,
     AbstractInversion,
     CircleInversion,
-    Reflection,
+    Reflection, #ComplexReflection
+    #ComplexRef,
     #a, b, c, d, r, p, θ,
     inverse,
     derivative,
     fixedpoints,
     kind,
     tr,
+    #tr2,
     det,
     compose,
     ∘,
     maptozerooneinf,
     mapfromzerooneinf
+
+
+# include("affinetransformations.jl")
+
+# export
+    #AbstractAffineTransformation,
+    #AffineTransformation,
+    #AffT,
+    #Translation
+    #AbstractLinearTransformation,
+    #LinearTransformation,
+    #LinT
+    #Homothety,
+    #Rotation,
+    #Rot,
+    #Reflection,
+    #Ref,
+    #inverse,
+    #derivative,
+    #tr,
+    #tr2,
+    #det,
+    #compose,
+    #∘
+
+
+include("rectregion.jl")
+
+export
+    RectRegion,
+    RectRegion3D,
+    isinside,
+    isinsideclosed,
+    #isinsidemax,
+    tomatrixindex,
+    torot90matrixindex,
+    tocubeindex
 
 end # module
