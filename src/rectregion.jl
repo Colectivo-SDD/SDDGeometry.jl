@@ -72,6 +72,22 @@ tomatrixindex(p::AbstractVector{<:Real}, w::Int, h::Int, rr::RectRegion) =
 tomatrixindex(p::Number, w::Int, h::Int, rr::RectRegion) =
     tomatrixindex(real(p), imag(p), w, h, rr)
 
+"""
+Tricky function useful for bifurcation diagrams.
+"""
+tomatrixindex(x::Real, y::Real, w::Int, h::Int, rr::RectRegion, k::Int) =
+    k, Int(ceil((h-1)*(y - rr.ymin)/(rr.ymax - rr.ymin))+1)
+
+"""
+"""
+tomatrixindex(p::AbstractVector{<:Real}, w::Int, h::Int, rr::RectRegion, k::Int) =
+    tomatrixindex(p[1], p[2], w, h, rr, k)
+
+"""
+"""
+tomatrixindex(p::Number, w::Int, h::Int, rr::RectRegion, k::Int) =
+    tomatrixindex(real(p), imag(p), w, h, rr, k)
+
 
 """
 """
@@ -88,6 +104,22 @@ torot90matrixindex(p::AbstractVector{<:Real}, w::Int, h::Int, rr::RectRegion) =
 """
 torot90matrixindex(p::Number, w::Int, h::Int, rr::RectRegion) =
     torot90matrixindex(real(p), imag(p), w, h, rr)
+
+"""
+Tricky function useful for bifurcation diagrams.
+"""
+torot90matrixindex(x::Real, y::Real, w::Int, h::Int, rr::RectRegion, k) =
+    Int(ceil((h-1)*(rr.ymax - y)/(rr.ymax - rr.ymin))+1), k
+
+"""
+"""
+torot90matrixindex(p::AbstractVector{<:Real}, w::Int, h::Int, rr::RectRegion, k::Int) =
+    torot90matrixindex(p[1], p[2], w, h, rr, k)
+
+"""
+"""
+torot90matrixindex(p::Number, w::Int, h::Int, rr::RectRegion, k::Int) =
+    torot90matrixindex(real(p), imag(p), w, h, rr, k)
 
 
 """
