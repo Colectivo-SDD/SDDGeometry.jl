@@ -4,7 +4,7 @@ authors = [
   "Renato Leriche Vázquez <r_lerichev@ciencias.unam.mx>",
   "Luis Muñiz",
 ]
-version = "0.1.0"
+version = "2.0"
 
 [compat]
 julia = "1.4"
