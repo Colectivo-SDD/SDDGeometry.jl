@@ -294,7 +294,11 @@ Derivative.
     (f.a * f.d - f.b * f.c) / ((f.c * z + f.d)^2)
   end
 end=#
-derivative(f::MobiusTransformation) = z::Number -> (f.a * f.d - f.b * f.c) / ((f.c * z + f.d)^2)
+function derivative(f::MobiusTransformation)
+  function(z::Number)
+    (f.a * f.d - f.b * f.c) / ((f.c * z + f.d)^2)
+  end
+end
 
 function derivative(f::LinearTransformation)
   function der(z::Number)
